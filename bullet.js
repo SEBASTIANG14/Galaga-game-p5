@@ -1,26 +1,27 @@
-// Clase que representa un disparo del jugador
 class Bullet {
-  constructor(x, y) {
+  constructor(x, y, isEnemy = false) {
     this.x = x;
     this.y = y;
-    this.speed = 7;
-    this.radius = 4;
+    this.r = 5;
+    this.speed = isEnemy ? 5 : -7;
+    this.isEnemy = isEnemy;
   }
 
-  // Dibuja la bala
-  show() {
-    fill(255, 255, 0); // Amarillo
-    noStroke();
-    ellipse(this.x, this.y, this.radius * 2);
-  }
-
-  // Mueve la bala hacia arriba
   update() {
-    this.y -= this.speed;
+    this.y += this.speed;
   }
 
-  // Verifica si la bala salió de la pantalla
+  show() {
+    noStroke();
+    if (this.isEnemy) {
+      fill(255, 0, 0);
+    } else {
+      fill(0, 255, 0);
+    }
+    ellipse(this.x, this.y, this.r * 2);
+  }
+
   offScreen() {
-    return this.y < 0;
+    return this.y < 0 || this.y > height;
   }
 }
