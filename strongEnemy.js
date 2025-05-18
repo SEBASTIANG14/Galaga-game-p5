@@ -1,9 +1,9 @@
-// Enemigo que requiere 3 golpes para morir
 class StrongEnemy extends Enemy {
   constructor(x, y) {
     super(x, y);
     this.health = 3;
     this.size = 40;
+    this.img = strongEnemyImg; // Imagen específica
   }
 
   hits(bullet) {
@@ -20,9 +20,11 @@ class StrongEnemy extends Enemy {
 
   show() {
     if (this.isAlive) {
-      fill(255, 165, 0); // naranja
-      ellipse(this.x, this.y, this.size);
-      fill(0);
+      // Dibuja la imagen
+      image(this.img, this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+      
+      // Muestra la salud (opcional)
+      fill(255);
       textAlign(CENTER, CENTER);
       textSize(12);
       text(this.health, this.x, this.y);

@@ -1,4 +1,3 @@
-// Clase base de enemigo
 class Enemy {
   constructor(x, y) {
     this.x = x;
@@ -6,6 +5,7 @@ class Enemy {
     this.size = 30;
     this.speed = 1;
     this.isAlive = true;
+    this.img = enemyImg; // Asignamos la imagen
   }
 
   update() {
@@ -14,8 +14,8 @@ class Enemy {
 
   show() {
     if (this.isAlive) {
-      fill(255, 0, 0);
-      ellipse(this.x, this.y, this.size);
+      // Dibuja la imagen en lugar de la elipse
+      image(this.img, this.x - this.size/2, this.y - this.size/2, this.size, this.size);
     }
   }
 
