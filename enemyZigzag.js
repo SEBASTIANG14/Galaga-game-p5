@@ -4,8 +4,8 @@ class EnemyZigzag extends Enemy {
     this.angle = 0;
     this.amplitude = 50;
     this.speed = 1.2;
-    this.img = zigzagEnemyImg; // Imagen específica
-    this.size = 35; // Puedes ajustar el tamaño
+    this.img = zigzagEnemyImg;
+    this.size = 35;
   }
 
   update() {
@@ -16,11 +16,11 @@ class EnemyZigzag extends Enemy {
 
   show() {
     if (this.isAlive) {
-      // Dibuja la imagen con rotación para el movimiento zigzag
       push();
+      imageMode(CENTER);
       translate(this.x, this.y);
-      rotate(sin(this.angle) * 0.5); // Pequeña inclinación según el movimiento
-      image(this.img, -this.size/2, -this.size/2, this.size, this.size);
+      rotate(sin(this.angle) * 0.5);
+      image(this.img, 0, 0, this.size, this.size);
       pop();
     }
   }

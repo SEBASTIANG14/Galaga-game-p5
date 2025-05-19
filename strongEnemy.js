@@ -3,7 +3,7 @@ class StrongEnemy extends Enemy {
     super(x, y);
     this.health = 3;
     this.size = 40;
-    this.img = strongEnemyImg; // Imagen específica
+    this.img = strongEnemyImg;
   }
 
   hits(bullet) {
@@ -20,14 +20,14 @@ class StrongEnemy extends Enemy {
 
   show() {
     if (this.isAlive) {
-      // Dibuja la imagen
-      image(this.img, this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+      imageMode(CENTER);
+      image(this.img, this.x, this.y, this.size, this.size);
       
-      // Muestra la salud (opcional)
+      // Muestra la salud
       fill(255);
       textAlign(CENTER, CENTER);
       textSize(12);
-      text(this.health, this.x, this.y);
+      text(this.health, this.x, this.y + this.size/2 + 10);
     }
   }
 }

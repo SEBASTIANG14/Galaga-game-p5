@@ -242,6 +242,10 @@ function resetGame() {
 }
 
 function initLevel1() {
+  // Limpia balas existentes
+  bullets = [];
+  enemyBullets = [];
+  
   enemies = [];
   for (let i = 0; i < 10; i++) {
     let x = random(50, width - 50);
@@ -251,6 +255,10 @@ function initLevel1() {
 }
 
 function initLevel2() {
+  // Limpia balas existentes
+  bullets = [];
+  enemyBullets = [];
+  
   enemies = [];
   for (let i = 0; i < 5; i++) {
     let x = random(50, width - 50);
@@ -263,6 +271,10 @@ function initLevel2() {
 }
 
 function initLevel3() {
+  // Limpia balas existentes
+  bullets = [];
+  enemyBullets = [];
+  
   enemies = [];
   bossSpawned = false;
   bossDefeated = false;
