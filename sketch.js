@@ -19,6 +19,9 @@ let nameInputActive = false;
 let scoreManager;
 let showingNameInput = false;
 let playerNameInput = '';
+let bgMusic;
+let playerShootSound;
+let enemyShootSound;
 
 function preload() {
   playerImg = loadImage('assets/playerShip.png');
@@ -26,6 +29,10 @@ function preload() {
   enemyImg = loadImage('assets/normalEnemy.png');
   strongEnemyImg = loadImage('assets/miniBoss.png');
   zigzagEnemyImg = loadImage('assets/normalEnemy.png');
+
+  bgMusic = loadSound('assets/bgSound.wav'); // Reemplaza con tu ruta y nombre de archivo
+  playerShootSound = loadSound('assets/playerShoot.wav'); // Reemplaza con tu ruta y nombre de archivo
+  enemyShootSound = loadSound('assets/enemyShoot.wav');
 }
 
 function setup() {
@@ -127,9 +134,9 @@ function draw() {
     // HUD
     fill(255);
     textSize(16);
-    text(`Puntaje: ${score}`, 10, 20);
-    text(`Nivel: ${level}`, 10, 40);
-    text(`Vidas: ${lives}`, 10, 60);
+    text(`Puntaje: ${score}`, 40, 20);
+    text(`Nivel: ${level}`, 30, 40);
+    text(`Vidas: ${lives}`, 32, 60);
 
     // Verificar Game Over
     if (lives <= 0) {
@@ -203,7 +210,11 @@ function keyPressed() {
   if (gameState === 'menu') {
     if (key === 'I' || key === 'i') {
       gameState = 'playing';
-      score = 0; 
+      score = 0;
+      if (!bgMusic.isPlaying()) { // Solo si no está sonando ya
+                bgMusic.setVolume(0.5); // Ajusta el volumen a tu gusto (0.0 a 1.0)
+                bgMusic.loop(); // Para que la música se repita
+            } 
     } else if (key === 'H' || key === 'h') {
       gameState = 'help';
     } else if (key === 'C' || key === 'c') {
@@ -216,6 +227,8 @@ function keyPressed() {
   } else if (gameState === 'playing') {
     if (key === ' ') {
       bullets.push(new Bullet(player.x, player.y - 20));
+      playerShootSound.play(); // Reproducir el sonido de disparo del jugador
+      playerShootSound.setVolume(0.2); // Ajusta el volumen
     }
   } else if (gameState === 'levelComplete') {
     if (keyCode === ENTER) {
@@ -248,14 +261,23 @@ function keyPressed() {
     }
     } else if (gameState === 'victory' || gameState === 'gameover') { // Unifica el manejo para ambas pantallas finales
       if (key === 'R' || key === 'r') {
+        if (bgMusic.isPlaying()) {
+              bgMusic.stop(); // Detener la música
+          } 
           resetGame();
           gameState = 'playing';
       } else if (key === 'M' || key === 'm') {
           score = 0; 
+          if (bgMusic.isPlaying()) {
+                bgMusic.stop(); // Detener la música
+            }
           resetGame();
           gameState = 'menu';
       }
   } else if (key === 'M' || key === 'm') {
+    if (bgMusic.isPlaying()) {
+                bgMusic.stop(); // Detener la música
+            }
     score = 0;
     resetGame();
     gameState = 'menu';
@@ -280,7 +302,7 @@ function showCredits() {
   textSize(24);
   text("Créditos", width / 2, 100);
   textSize(16);
-  text("Desarrollado por [Tu Nombre Aquí]\nJuego tipo Galaga en p5.js", width / 2, 180);
+  text("Desarrollado por [Sebastian Gorostieta Olivas \n Cristofer Jimenez Fernandez \n Angel Daniel Romero Carreño]\nJuego tipo Galaga en p5.js", width / 2, 180);
   text("Presiona 'M' para volver al menú", width / 2, height - 40);
 }
 
