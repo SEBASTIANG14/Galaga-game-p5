@@ -13,6 +13,12 @@ let enemyBullets = [];
 let levelCompleted = false;
 let bossDefeated = false;
 let bossSpawned = false;
+let highscoresState = false;
+let playerName = '';
+let nameInputActive = false;
+let scoreManager;
+let showingNameInput = false;
+let playerNameInput = '';
 
 function preload() {
   playerImg = loadImage('assets/playerShip.png');
@@ -21,18 +27,25 @@ function preload() {
   strongEnemyImg = loadImage('assets/miniBoss.png');
   zigzagEnemyImg = loadImage('assets/normalEnemy.png');
 }
+
 function setup() {
   createCanvas(600, 600);
   player = new Player();
   menu = new Menu();
+  scoreManager = new ScoreManager();
   initLevel1();
 }
 
 function draw() {
-  if (gameState === 'menu') {
-    menu.display();
+   if (gameState === 'menu') {
+    if (highscoresState) {
+      menu.showHighscores();
+    } else {
+      menu.display();
+    }
   } else if (gameState === 'playing') {
     background(0);
+  
 
     player.move();
     player.show();
@@ -138,36 +151,67 @@ function draw() {
     showHelp();
   } else if (gameState === 'credits') {
     showCredits();
-  } else if (gameState === 'gameover') {
+ } else if (gameState === 'gameover' || gameState === 'victory') {
     background(0);
-    fill(255, 0, 0);
+    fill(gameState === 'victory' ? 0 : 255, 255, 0); // Amarillo para victoria, blanco para game over
     textAlign(CENTER);
     textSize(32);
-    text("GAME OVER", width / 2, height / 2 - 40);
-    textSize(16);
-    text(`Puntaje final: ${score}`, width / 2, height / 2);
-    text("Presiona 'M' para volver al menú", width / 2, height / 2 + 40);
-  } else if (gameState === 'victory') {
-    background(0);
-    fill(0, 255, 0);
-    textAlign(CENTER);
-    textSize(32);
-    text("¡Has ganado!", width / 2, height / 2 - 40);
-    textSize(16);
-    text(`Puntaje final: ${score}`, width / 2, height / 2);
-    text("Presiona 'R' para jugar de nuevo", width / 2, height / 2 + 40);
-    text("Presiona 'M' para volver al menú", width / 2, height / 2 + 70);
+    text(gameState === 'victory' ? "¡VICTORIA!" : "GAME OVER", width / 2, height / 2 - 80);
+
+    textSize(24);
+    text(`Puntaje: ${score}`, width / 2, height / 2 - 30);
+
+    // Lógica para mostrar la entrada del nombre
+    if (score > 0 && !showingNameInput && (scoreManager.isHighscore(score) || scoreManager.getHighscores().length < scoreManager.maxScores)) {
+      // Solo muestra el input si la puntuación es válida para ser un highscore
+      showingNameInput = true;
+    }
+
+    if (showingNameInput) {
+      fill(255);
+      textSize(20);
+      text("Ingresa tu nombre (5 letras):", width / 2, height / 2 + 20);
+      text(playerNameInput + (frameCount % 60 < 30 ? "_" : ""), width / 2, height / 2 + 60);
+      textSize(16);
+      text("Presiona ENTER para guardar", width / 2, height / 2 + 100);
+    } else {
+      textSize(18);
+      text("Presiona R para reiniciar", width / 2, height / 2 + 40);
+      text("Presiona M para menú", width / 2, height / 2 + 80);
+    }
   }
 }
 
 function keyPressed() {
+    if (showingNameInput) {
+        if (keyCode === ENTER) {
+            if (playerNameInput.length > 0) {
+                scoreManager.addScore(playerNameInput, score);
+                showingNameInput = false; // Desactiva la entrada de nombre
+                playerNameInput = ''; // Limpia el input
+                gameState = 'menu'; //Regresar al menú.
+                score = 0; 
+                resetGame(); 
+            }
+        } else if (keyCode === BACKSPACE) {
+            playerNameInput = playerNameInput.slice(0, -1);
+        } else if (/^[a-zA-Z]$/.test(key) && playerNameInput.length < 5) {
+            playerNameInput += key.toUpperCase();
+        }
+        return;
+    }
   if (gameState === 'menu') {
     if (key === 'I' || key === 'i') {
       gameState = 'playing';
+      score = 0; 
     } else if (key === 'H' || key === 'h') {
       gameState = 'help';
     } else if (key === 'C' || key === 'c') {
       gameState = 'credits';
+    } else if (key === 'P' || key === 'p') {
+      highscoresState = !highscoresState;
+    } else if (key === 'M' || key === 'm') {
+      highscoresState = false;
     }
   } else if (gameState === 'playing') {
     if (key === ' ') {
@@ -188,15 +232,36 @@ function keyPressed() {
       resetGame();
       gameState = 'playing';
     } else if (key === 'M' || key === 'm') {
+      score = 0; 
       resetGame();
       gameState = 'menu';
     }
+  } else if ((gameState === 'gameover' || gameState === 'victory') && nameInputActive) {
+    if (keyCode === ENTER && playerName.trim() !== '') {
+      menu.addHighscore(playerName, score);
+      nameInputActive = false;
+      score = 0; 
+    } else if (keyCode === BACKSPACE) {
+      playerName = playerName.slice(0, -1);
+    } else if (key.length === 1 && playerName.length < 10 && /[a-zA-Z0-9]/.test(key)) {
+      playerName += key;
+    }
+    } else if (gameState === 'victory' || gameState === 'gameover') { // Unifica el manejo para ambas pantallas finales
+      if (key === 'R' || key === 'r') {
+          resetGame();
+          gameState = 'playing';
+      } else if (key === 'M' || key === 'm') {
+          score = 0; 
+          resetGame();
+          gameState = 'menu';
+      }
   } else if (key === 'M' || key === 'm') {
+    score = 0;
     resetGame();
     gameState = 'menu';
+    highscoresState = false;
   }
 }
-
 function showHelp() {
   background(0);
   fill(255);
@@ -230,15 +295,20 @@ function showLevelComplete(levelNumber) {
 }
 
 function resetGame() {
-  lives = 3;
-  level = 1;
-  score = 0;
-  bullets = [];
-  enemies = [];
-  enemyBullets = [];
-  player = new Player();
-  initLevel1();
-  bossDefeated = false;
+    lives = 3;
+    level = 1;
+    score = 0;
+    bullets = [];
+    enemies = [];
+    enemyBullets = [];
+    player = new Player();
+    initLevel1();
+    bossDefeated = false;
+    bossSpawned = false; // Asegurarse de resetear el boss para el nivel 3
+
+    //Reinicia el estado de la entrada de nombre
+    showingNameInput = false; 
+    playerNameInput = '';
 }
 
 function initLevel1() {
